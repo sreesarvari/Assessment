@@ -1,0 +1,64 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"regexp"
+	"strings"
+)
+
+type Interface interface {
+	TransformRune(pos int)
+	GetValueAsRuneSlice() []rune
+}
+
+type skipString struct {
+	Str      string
+	Interval int
+	Count    int
+}
+
+func (s *skipString) TransformRune(pos int) {
+	if isSpecialCharacter(string(s.Str[pos])) {
+		return
+	}
+
+	if s.Count%s.Interval == 0 {
+		s.Str = s.Str[:pos] + strings.ToUpper(string(s.Str[pos])) + s.Str[pos+1:]
+	}
+
+	s.Count++
+}
+
+func (s *skipString) GetValueAsRuneSlice() []rune {
+	return []rune(s.Str)
+}
+
+func MapString(i Interface) {
+	for pos := range i.GetValueAsRuneSlice() {
+		i.TransformRune(pos)
+	}
+}
+
+func NewSkipString(l int, s string) skipString {
+	return skipString{
+		Str:      strings.ToLower(s),
+		Interval: l,
+		Count:    1,
+	}
+}
+
+func main() {
+	s := NewSkipString(3, "Aspiration.com")
+	MapString(&s)
+	fmt.Println(s.Str)
+}
+
+func isSpecialCharacter(s string) bool {
+	re, err := regexp.Compile(`[^\w]`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return re.ReplaceAllString(s, " ") == " "
+}
